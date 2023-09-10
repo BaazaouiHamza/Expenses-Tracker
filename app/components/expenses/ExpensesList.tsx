@@ -1,12 +1,18 @@
 import ExpenseListItem from './ExpenseListItem';
+import type { Expense } from '~/types/Expense';
 
-function ExpensesList({ expenses }) {
+type Props = {
+  expenses: Expense[]
+}
+
+const ExpensesList: React.FC<Props> = ({ expenses }) => {
 
   return (
     <ol id="expenses-list">
       {expenses.map((expense) => (
         <li key={expense.id}>
           <ExpenseListItem
+            id={expense.id}
             title={expense.title}
             amount={expense.amount}
           />

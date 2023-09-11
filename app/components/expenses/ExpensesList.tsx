@@ -1,11 +1,7 @@
 import ExpenseListItem from './ExpenseListItem';
-import type { Expense } from '~/types/Expense';
 
-type Props = {
-  expenses: Expense[]
-}
 
-const ExpensesList: React.FC<Props> = ({ expenses }) => {
+const ExpensesList = ({ expenses }) => {
 
   return (
     <ol id="expenses-list">

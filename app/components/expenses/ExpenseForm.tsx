@@ -1,4 +1,4 @@
-import { Form, Link, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
+import { Form, Link, useActionData, useMatches, useNavigation, useParams } from "@remix-run/react";
 import type { ValidationErrors } from "~/data/validation.server";
 
 
@@ -13,9 +13,20 @@ function ExpenseForm() {
 
     const validationErrors = useActionData() as ValidationErrors
 
+    const params = useParams()
+
+    const matches = useMatches()
+    const expenses = matches.find(
+        match => match.id === 'routes/__app/expenses'
+    ).data;
+
+    const expenseData = expenses.find(expense => expense.id === params.id)
+
     const navigation = useNavigation()
 
-    const expenseData = useLoaderData()
+    // const expenseData = useLoaderData()
+
+
     const defaultValues = expenseData ? {
         title: expenseData.title,
         amount: expenseData.amount,

@@ -6,7 +6,6 @@ import { getExpenses } from "~/data/expenses.server";
 
 export default function ExpensesLayout() {
     const expenses = useLoaderData()
-    console.log(expenses)
     return (
         <>
             <Outlet />
@@ -28,5 +27,6 @@ export default function ExpensesLayout() {
 }
 
 export const loader: LoaderFunction = () => {
+    console.log("EXPENSES LOADER")
     return getExpenses()
 }

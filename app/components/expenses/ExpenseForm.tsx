@@ -21,8 +21,14 @@ function ExpenseForm() {
     ).data;
 
     const expenseData = expenses.find(expense => expense.id === params.id)
-
     const navigation = useNavigation()
+
+    if (params.id && !expenseData) {
+        // throw new Response()
+        return <p>Invalid expense id.</p>
+    }
+
+
 
     // const expenseData = useLoaderData()
 

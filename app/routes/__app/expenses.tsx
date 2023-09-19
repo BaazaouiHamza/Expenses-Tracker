@@ -6,6 +6,9 @@ import { getExpenses } from "~/data/expenses.server";
 
 export default function ExpensesLayout() {
     const expenses = useLoaderData()
+
+    const hasExpenses = expenses && expenses.length > 0
+
     return (
         <>
             <Outlet />
@@ -20,13 +23,25 @@ export default function ExpensesLayout() {
                         <span>Load Raw Data</span>
                     </a>
                 </section>
-                <ExpensesList expenses={expenses} />
+                {hasExpenses && <ExpensesList expenses={expenses} />}
+                {!hasExpenses && <section id="no-expenses">
+                    <h1>No expenses found</h1>
+                    <p> Start <Link to='add'>adding some</Link> today.</p>
+                </section>}
             </main>
         </>
     )
 }
 
-export const loader: LoaderFunction = () => {
-    console.log("EXPENSES LOADER")
-    return getExpenses()
+export const loader: LoaderFunction = async () => {
+    const expenses = await getExpenses()
+    return expenses
+    // const expenses = await getExpenses()
+    // if (!expenses || expenses.length === 0) {
+    //     throw json({ message: 'Could not find any expenses.' }, { status: 404, statusText: 'No Expenses found' })
+    // }
 }
+
+// export const ErrorBoundary = () => {
+//     return <p>Error </p>
+// }

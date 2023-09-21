@@ -1,5 +1,6 @@
+import { createCookieSessionStorage, redirect } from "@remix-run/node";
 import { prisma } from "./database.server"
-import { hash } from 'bcryptjs'
+import { hash, compare } from 'bcryptjs'
 export class CustomError extends Error {
     status: number;
 
@@ -7,6 +8,28 @@ export class CustomError extends Error {
         super(message);
         this.status = status;
     }
+}
+
+const SESSION_SECRET = process.env.SESSION_SECRET
+
+const sessionStorage = createCookieSessionStorage({
+    cookie: {
+        secure: process.env.NODE_ENV === "production",
+        secrets: [SESSION_SECRET],
+        sameSite: 'lax',
+        maxAge: 30 * 24 * 60 * 60, // 30 days
+        httpOnly: true
+    }
+})
+
+const createUserSession = async (userId, redirectPath) => {
+    const session = await sessionStorage.getSession()
+    session.set('userId', userId)
+    return redirect(redirectPath, {
+        headers: {
+            'Set-Cookie': await sessionStorage.commitSession(session)
+        }
+    })
 }
 
 export const signUp = async ({ email, password }) => {
@@ -18,12 +41,14 @@ export const signUp = async ({ email, password }) => {
 
     const passwordHash = await hash(password, 12)
 
-    await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             email: email,
             password: passwordHash
         }
     })
+
+    return createUserSession(user.id, "/expenses")
 }
 
 export const login = async ({ email, password }) => {
@@ -33,4 +58,12 @@ export const login = async ({ email, password }) => {
         const error = new CustomError('Could not log you in,please check the provided credentials.', 401)
         throw error
     }
+
+    const passwordCorrect = await compare(password, existingUser.password)
+    if (!passwordCorrect) {
+        const error = new CustomError('Could not log you in,please check the provided credentials.', 401)
+        throw error
+    }
+
+    return createUserSession(existingUser.id, '/expenses')
 }

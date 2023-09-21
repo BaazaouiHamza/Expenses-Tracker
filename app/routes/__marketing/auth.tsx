@@ -1,7 +1,8 @@
-import type { ActionFunction, LinksFunction } from "@remix-run/node"
+import { redirect, type ActionFunction, type LinksFunction } from "@remix-run/node"
 import authStyles from '../../styles/auth.css'
 import AuthForm from "~/components/auth/authForm"
 import { validateCredentials } from "~/data/validation.server"
+import { CustomError, signUp } from "~/data/auth.server"
 
 export default function AuthPage() {
     return <AuthForm />
@@ -12,7 +13,10 @@ export const action: ActionFunction = async ({ request }) => {
     const authMode = searchParams.get('mode') || 'login'
 
     const formData = await request.formData()
-    const credentials = Object.fromEntries(formData)
+    const credentials = {
+        email: formData.get('email'),
+        password: formData.get('password'),
+    }
 
 
     try {
@@ -21,10 +25,19 @@ export const action: ActionFunction = async ({ request }) => {
         return error
     }
 
-    if (authMode === 'login') {
-        //login
-    } else {
-        // sign up
+    try {
+        if (authMode === 'login') {
+            //login
+        } else {
+            await signUp(credentials)
+            return redirect('/expenses')
+        }
+    } catch (error) {
+        if (error instanceof CustomError) {
+            return {
+                credentials: error.message
+            }
+        }
     }
 }
 

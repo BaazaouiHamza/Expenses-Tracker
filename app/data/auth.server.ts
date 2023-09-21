@@ -25,3 +25,12 @@ export const signUp = async ({ email, password }) => {
         }
     })
 }
+
+export const login = async ({ email, password }) => {
+    const existingUser = await prisma.user.findFirst({ where: { email } })
+
+    if (!existingUser) {
+        const error = new CustomError('Could not log you in,please check the provided credentials.', 401)
+        throw error
+    }
+}

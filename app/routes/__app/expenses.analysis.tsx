@@ -3,6 +3,7 @@ import { isRouteErrorResponse, useLoaderData, useRouteError } from "@remix-run/r
 import Chart from "~/components/expenses/Chart";
 import ExpenseStatistics from "~/components/expenses/ExpenseStatistics";
 import ErrorComponent from "~/components/util/Error";
+import { requireUserSession } from "~/data/auth.server";
 import { getExpenses } from "~/data/expenses.server";
 
 
@@ -17,7 +18,9 @@ export default function ExpensesAnalysisPage() {
     </main>)
 }
 
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunction = async ({ request }) => {
+    await requireUserSession(request)
+
     const expenses = await getExpenses()
     if (!expenses || expenses.length === 0) {
         throw json(

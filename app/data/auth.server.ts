@@ -90,3 +90,11 @@ export const destroyUserSession = async (request: Request) => {
     })
 
 }
+
+export const requireUserSession = async (request: Request) => {
+    const userId = await getUserFromSession(request)
+    if (!userId) {
+        throw redirect('/auth?mode=login')
+    }
+
+}

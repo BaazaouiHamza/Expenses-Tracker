@@ -79,3 +79,14 @@ export const login = async ({ email, password }) => {
 
     return createUserSession(existingUser.id, '/expenses')
 }
+
+export const destroyUserSession = async (request: Request) => {
+    const session = await sessionStorage.getSession(request.headers.get('Cookie'))
+
+    return redirect('/', {
+        headers: {
+            'Set-Cookie': await sessionStorage.destroySession(session)
+        }
+    })
+
+}

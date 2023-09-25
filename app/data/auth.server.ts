@@ -96,5 +96,5 @@ export const requireUserSession = async (request: Request) => {
     if (!userId) {
         throw redirect('/auth?mode=login')
     }
-
+    return userId
 }
